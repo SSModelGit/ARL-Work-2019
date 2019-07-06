@@ -1,4 +1,4 @@
-# Work done at ARL, TSMI, summer of 2019
+# Work done at ARL, TMSI, summer of 2019
 Repository containing work done at ARL. Currently split into three branches of work:
  - AWS:
    - Connection between AWS instances and ROS
