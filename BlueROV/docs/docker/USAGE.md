@@ -25,8 +25,7 @@ The desired image is built using this [Dockerfile](https://github.com/SSModelGit
 ```
 docker pull sswaminathan235/bluerov-ros-dock:stable
 ```
-
-**Either tell to do** `docker start container-name` **post container instatiation, or to run** `docker run docker-image`**, with automatic container removal on shutdown.**
+Instantiate the container by running
 
 Also maybe mount volume to store mavros output?
 
@@ -40,3 +39,5 @@ The standard setup for ROS on the BlueROV is to have:
    - The two communicate via MAVLink using UDP sockets, through the tethered connection
    - This is how the RPi would normally communicate with QGroundControl. `mavros` simply sits on the port normally allocated for communication with QGC.
  - View [patrickelectric's diagram](https://github.com/patrickelectric/bluerov_ros_playground/#software-layer-diagram) for a nice graphical layout of the standard setup.
+ - Here is a graphical representation of the docker container's behavior within this version of the ROS setup (the graph is derived from patrickelectric's):
+ ![BlueROV <-> Docker (ROS) Diagram][BlueROV <-> Docker [ROS] Diagram.png]
