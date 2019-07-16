@@ -25,9 +25,12 @@ The desired image is built using this [Dockerfile](https://github.com/SSModelGit
 ```
 docker pull sswaminathan235/bluerov-ros-dock:stable
 ```
-Instantiate the container by running
-
-Also maybe mount volume to store mavros output?
+Instantiate the container by running the following command:
+```
+docker run --net=host -v "/dev:/dev:rw" -v "/media:/media:rw" --name=bluerov sswaminathan235/bluerov-ros-dock:stable
+```
+(OPTIONAL) To allow the container to store results (from mavros, etc.), mount a volume to the container as well, like so:
+*TO BE COMPLETED*
 
 ## Appendix
 ### The standard ROS setup for the BlueROV
@@ -38,6 +41,44 @@ The standard setup for ROS on the BlueROV is to have:
  - `mavros` replaces QGroundControl to send and receive data to and from the RPi
    - The two communicate via MAVLink using UDP sockets, through the tethered connection
    - This is how the RPi would normally communicate with QGroundControl. `mavros` simply sits on the port normally allocated for communication with QGC.
- - View [patrickelectric's diagram](https://github.com/patrickelectric/bluerov_ros_playground/#software-layer-diagram) for a nice graphical layout of the standard setup.
- - Here is a graphical representation of the docker container's behavior within this version of the ROS setup (the graph is derived from patrickelectric's):
- ![BlueROV <-> Docker (ROS) Diagram][BlueROV <-> Docker [ROS] Diagram.png]
+ - View [patrickelectric's diagram](https://github.com/patrickelectric/bluerov_ros_playground/#software-layer-diagram) for a nice graphical layout of the standard setup:
+ 
+ <pre>
+                      +-----------------------+         +------------------------+
+                      |     <b>Raspberry Pi</b>      |         |    <b>Topside Commputer</b>   |
+                      |    <b>ip 192.168.2.2</b>     |         |     <b>ip 192.168.2.1</b>     |
+                      |                       |         |                        |
++-------+  Telemetry  | +-------------------+ |         |                        |
+|Pixhawk<-------------->USB         <b>MAVProxy</b>| |         |                        |
++-------+    Pilot    | +                   + |         | +--------------------+ |
+            Control   | |            udpbcast<----------->:14550         <b>MAVROS</b>| |
+                      | +-------------------+ |  Pilot  | |(UDP)               | |
+                      |                       | Control | |                    | |
+                      | +-------------------+ |         | |       (ROS)        | |
++---------+           | CSI+2       <b>raspivid</b>| |         | +------+/mavros+-----+ |
+|Raspberry+------------>camera              | |         |           ^            |
+| Camera  |           | port                | |         |           |            |
++---------+           | +                   | |         | +---------v----------+ |
+                      | |                   | |         | |subs.py      pubs.py| |
+                      | +------------+stdout+ |         | |                    | |
+                      |                  +    |         | |                    | |
+                      |             Raw  |    |         | |                    | |
+                      |             H264 |    |         | |                    | |
+                      |                  v    |         | |      <b>user.py</b>       | |
+                      | +------------+ fdsrc+ |         | |                    | |
+                      | |<b>gstreamer</b>          | |         | |                    | |
+                      | |                   + |         | :5600 video.py       | |
+                      | |             udpsink+----------->(UDP)                | |
+                      | +-------------------+ |  Video  | +---------^----------+ |
+                      |                       | Stream  |           |            |
+                      +-----------------------+         |           +            |
+                                                        | +--------/joy--------+ |
+                                                        | |<b>joy</b>     (ROS)       | |         +--------+
+                                                        | |                  USB<----------+Joystick|
+                                                        | +--------------------+ |  Pilot  +--------+
+                                                        |                        | Control
+                                                        +------------------------+
+</pre>
+
+ - Here is a graphical representation of the docker container's behavior within this version of the ROS setup (the graph is derived from the one above):
+ ![BlueROV <-> Docker (ROS) Diagram](https://github.com/SSModelGit/ARL-Work-2019/blob/bluerov/BlueROV/docs/docker/BlueROV%20%3C-%3E%20Docker%20%5BROS%5D%20Diagram.png)
