@@ -1,9 +1,12 @@
 # Using Docker to run ROS on the BlueROV
 
-## Why use Docker?
+## Motivation
 The standard method of integrating ROS with the BlueROV is to leave the Pixhawk (flight controller) and RPi3 (companion computer on board the BlueROV) untouched, and instead to run ROS on the topside computer. There, ROS will communicate with RPi3 via the tether and UDP sockets using `mavros`, connecting the Pixhawk/RPi3 to the ROS architecture. Look at the [Appendix](#the-standard-ros-setup-for-the-bluerov) for a more detailed look at this setup.
 
-Clearly, this is a setup that works for an ROV approach - to make ROS usable autonomously, it has to be placed on board the RPi. However, the native RPi image is in Raspbian, which does not lend itself nicely to installing ROS. The way around this is to "isolate" ROS within a container running on the RPi - using Docker.
+Clearly, this is a setup that works for an ROV approach but not for tetherless vehicles such as AUV or USV with sporadic comms. For operation praticality, these vehicles need autonomy with ROS to be placed on board the RPi instead of topside computer.
+
+## Why use Docker?
+However, the native RPi image is in Raspbian, which does not lend itself nicely to installing ROS. The way around this is to "isolate" ROS within a container running on the RPi - using Docker.
 
 Essentially, we want to create a very lightweight imitation of a topside computer within the RPi, and have it operate like the topside computer - UDP connections via `mavros`, etc. - all while remaining within the RPi itself. Docker allows us to do just that, with the following properties:
  - It creates an "image" of a system with only the necessary components required to run.
