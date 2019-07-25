@@ -9,7 +9,7 @@ import json
 # Uses libraries: roslibpy, rosbridge
 
 
-class ROS_Connect:
+class AWS_Connect:
     # Requires: ROS host IP, port number where rosbridge is running, and maximum size of storage buffers
     def __init__(self, host, port, bufsize):
         self.client = roslibpy.Ros(host=host, port=port)
@@ -83,7 +83,7 @@ def test_publisher(connection):
 
 
 if __name__ == '__main__':
-    connection = ROS_Connect('localhost', 9090, 5)
+    connection = AWS_Connect('localhost', 9090, 5)
     try:
         test_publisher(connection)
     except KeyboardInterrupt:
