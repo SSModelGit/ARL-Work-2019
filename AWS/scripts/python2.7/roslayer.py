@@ -8,8 +8,9 @@ import json
 # Created by Shashank Swaminathan, June 2019, for work in ARL at TMSI, NUS
 # Uses libraries: roslibpy, rosbridge
 
+HOST_ID = 1722
 
-class AWS_Connect:
+class ROSLayer:
     # Requires: ROS host IP, port number where rosbridge is running, and maximum size of storage buffers
     def __init__(self, host, port, bufsize):
         self.client = roslibpy.Ros(host=host, port=port)
@@ -31,6 +32,7 @@ class AWS_Connect:
 
     def callback(self, topic, message):
         print("Here is the topic: " + topic)
+        message = dict(data=message, machine_id=HOST_ID)
         m_jstring = json.dumps(message)
         if self.in_buffer[topic].full() == True:
             self.in_buffer[topic].get_nowait()
@@ -82,9 +84,9 @@ def test_publisher(connection):
         i = i+1
 
 
-if __name__ == '__main__':
-    connection = AWS_Connect('localhost', 9090, 5)
-    try:
-        test_publisher(connection)
-    except KeyboardInterrupt:
-        connection.close()
+# if __name__ == '__main__':
+#     connection = ROSLayer('localhost', 9090, 5)
+#     try:
+#         test_subscriber(connection)
+#     except KeyboardInterrupt:
+#         connection.close()

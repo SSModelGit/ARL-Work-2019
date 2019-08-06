@@ -1,0 +1,145 @@
+import sys
+import socket
+import json
+try:
+    import selectors
+except ImportError:
+    import selectors2 as selectors
+import types
+from argparse  import Namespace
+
+# sel = selectors.DefaultSelector()
+# message_data = ["Message 1 from client.", "Here's a super long string that I'm going to try and see if I can break the socket transmission. We're going to go for record lengths, while also trying to not break the computer in the process. Here goes nothing..."]
+# message_data = json.dumps(dict(data=message_data))
+# data = "" # Trying to set data as a global variable
+
+# def start_connections(host, port, num_conns):
+#     global data, message_data
+#     server_addr = (host, port)
+#     for i in range(0, num_conns):
+#         connid = i + 1
+#         print("starting connection", connid, "to", server_addr)
+#         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#         sock.setblocking(False)
+#         sock.connect_ex(server_addr)
+#         events = selectors.EVENT_READ | selectors.EVENT_WRITE
+#         data = Namespace(
+#             connid=connid,
+#             msg_total=len(message_data),
+#             recv_total=0,
+#             messages=message_data,
+#             outb="",
+#         )
+#         sel.register(sock, events)
+
+
+# def service_connection(key, mask):
+#     sock = key.fileobj
+#     global data
+#     # data = key.data
+#     if mask & selectors.EVENT_READ:
+#         recv_data = sock.recv(1024)  # Should be ready to read
+#         if recv_data:
+#             print("received", repr(recv_data), "from connection", data.connid)
+#             data.recv_total += len(recv_data)
+#         if not recv_data or data.recv_total == data.msg_total:
+#             print("closing connection", data.connid)
+#             sel.unregister(sock)
+#             sock.close()
+#     if mask & selectors.EVENT_WRITE:
+#         if not data.outb and data.messages:
+#             data.outb = data.messages
+#             data.messages = ""
+#         if data.outb:
+#             print("sending", repr(data.outb), "to connection", data.connid)
+#             sent = sock.send(data.outb)  # Should be ready to write
+#             data.outb = data.outb[sent:]
+
+
+# if len(sys.argv) != 4:
+#     print("usage:", sys.argv[0], "<host> <port> <num_connections>")
+#     sys.exit(1)
+
+# host, port, num_conns = sys.argv[1:4]
+# start_connections(host, int(port), int(num_conns))
+
+# try:
+#     while True:
+#         events = sel.select(timeout=1)
+#         if events:
+#             for key, mask in events:
+#                 service_connection(key, mask)
+#         # Check for a socket being monitored to continue.
+#         if not sel.get_map():
+#             break
+# except KeyboardInterrupt:
+#     print("caught keyboard interrupt, exiting")
+# finally:
+#     sel.close()
+
+
+class AWSLayer:
+    def __init__(self, host, port):
+        self.host = host
+        self.port = port
+
+    def _start_connections(self, message):
+        self.sel = selectors.DefaultSelector()
+        server_addr = (self.host, self.port)
+        print("starting connection to", server_addr)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setblocking(False)
+        sock.connect_ex(server_addr)
+        events = selectors.EVENT_READ | selectors.EVENT_WRITE
+        data = Namespace(
+            msg_total=len(message),
+            recv_total=0,
+            message=message,
+            outb="",
+        )
+        self.sel.register(sock, events, data=data)
+
+    def _service_connection(self, key, mask):
+        sock = key.fileobj
+        data = key.data
+        if mask & selectors.EVENT_READ:
+            recv_data = sock.recv(1024)  # Should be ready to read
+            if recv_data:
+                print("received", repr(recv_data))
+                data.recv_total += len(recv_data)
+            if not recv_data or data.recv_total == data.msg_total:
+                print("closing connection")
+                self.sel.unregister(sock)
+                sock.close()
+        if mask & selectors.EVENT_WRITE:
+            if not data.outb and data.message:
+                data.outb = data.message
+                data.message = ""
+            if data.outb:
+                print("sending", repr(data.outb), "to socket")
+                sent = sock.send(data.outb)  # Should be ready to write
+                data.outb = data.outb[sent:]
+
+    def connect_aws(self, message):
+        self._start_connections(message)
+        try:
+            while True:
+                events = self.sel.select(timeout=1)
+                if events:
+                    for key, mask in events:
+                        self._service_connection(key, mask)
+                # Check for a socket being monitored to continue.
+                if not self.sel.get_map():
+                    break
+        except KeyboardInterrupt:
+            print("caught keyboard interrupt, exiting")
+        finally:
+            self.sel.close()
+
+
+if __name__ == '__main__':
+    awsLayer = AWSLayer('localhost', 9090)
+    mes = dict(linear=dict(x=90, y=360, z=0),
+               angular=dict(x=0, y=360, z=90))
+    message = json.dumps(mes)
+    awsLayer.connect_aws(message)
