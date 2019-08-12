@@ -31,8 +31,6 @@ class ROSLayer:
                 lambda message: self.callback(topic, message))
 
     def callback(self, topic, message):
-        print("Here is the topic: " + topic)
-        message = dict(data=message, machine_id=HOST_ID)
         m_jstring = json.dumps(message)
         if self.in_buffer[topic].full() == True:
             self.in_buffer[topic].get_nowait()
@@ -87,6 +85,6 @@ def test_publisher(connection):
 # if __name__ == '__main__':
 #     connection = ROSLayer('localhost', 9090, 5)
 #     try:
-#         test_subscriber(connection)
+#         test_publisher(connection)
 #     except KeyboardInterrupt:
 #         connection.close()
