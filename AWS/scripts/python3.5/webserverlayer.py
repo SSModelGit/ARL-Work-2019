@@ -66,11 +66,13 @@ class ServerData:
     def __init__(self):
         self.ros_data = dict()
         self.server_data = dict()
+        self.blank_data = json.dumps(dict(topic="/radio_silence_serv",
+                                          data=json.dumps(dict(data="yosh"))))
 
     def store_ros_data(self, data):
         parsed_data = json.loads(data.decode("utf-8"))
         m_id = parsed_data['m_id']
-        self.ros_data[m_id] = map(json.loads, parsed_data['data'])
+        self.ros_data[m_id] = list(map(json.loads, parsed_data['data']))
         return m_id
 
     def get_ros_data(self):
@@ -80,6 +82,8 @@ class ServerData:
         self.server_data[m_id] = data
 
     def get_server_data(self, m_id):
+        if m_id not in self.server_data.keys():
+            self.server_data[m_id] = self.blank_data
         return self.server_data[m_id]
 
 
@@ -87,9 +91,12 @@ if __name__ == '__main__':
     vault = ServerData()
     server = WebServerLayer('localhost', 9091)
 
-    mes = dict(linear= dict(x=0,y=100,z=0),
-               angular=dict(x=0,y=180,z=0))
+    mes = dict(linear= dict(x=1,y=0,z=0),
+               angular=dict(x=0,y=0,z=1))
 
-    vault.set_server_data(1722, json.dumps(mes))
+    message = json.dumps(dict(topic="/turtle1/cmd_vel",
+                              data=json.dumps(mes)))
+
+    vault.set_server_data(1722, message)
 
     server.run(vault)
