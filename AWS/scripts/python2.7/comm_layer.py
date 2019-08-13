@@ -9,7 +9,8 @@ if __name__ == '__main__':
     rosLayer = ROSLayer('localhost', 9090, 5)
     awsLayer = WebLayer('localhost', 9091)
 
-    topics = {"/chatter": "geometry_msgs/Twist", "/chatter_two": "geometry_msgs/Twist"}
+    topics = {"/radio_silence_dev": "std_msgs/String", "/radio_silence_serv": "std_msgs/String",
+              "/turtle1/cmd_vel": "geometry_msgs/Twist", "/turtle1/pose": "turtlesim/Pose"}
 
     ros_data = dict()
 
@@ -17,10 +18,13 @@ if __name__ == '__main__':
         rosLayer.run(topics)
 
         while True:
-            ros_data["data"] = rosLayer.get_data_from_buffer("/chatter")
+            ros_data["data"] = rosLayer.get_data_from_buffer("/turtle1/pose")
             ros_data["m_id"] = HOST_ID
+            # print("ROS_DATA:::", ros_data)
             awsLayer.connect_aws(json.dumps(ros_data))
-            rosLayer.send_data_to_topic("/chatter_two", awsLayer.stored_data)
+            serv_data = json.loads(awsLayer.stored_data)
+            # print("SERV_DATA::", serv_data)
+            rosLayer.send_data_to_topic(serv_data['topic'], serv_data['data'])
 
     except KeyboardInterrupt:
         print("Caught keyboard interrupt, exiting")
