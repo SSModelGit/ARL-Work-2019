@@ -27,16 +27,20 @@ class ROSLayer:
             self.topics[topic] = roslibpy.Topic(
                 self.client, topic, topic_list[topic])
             self.in_buffer[topic] = Queue.Queue(maxsize=self.bufsize)
-            self.topics[topic].subscribe(
-                lambda message: self.callback(topic, message))
+            spc = self.callback_constructor(topic)
+            self.topics[topic].subscribe(spc)
 
-    def callback(self, topic, message):
-        m_jstring = json.dumps(message)
-        if self.in_buffer[topic].full() == True:
-            self.in_buffer[topic].get_nowait()
-            self.in_buffer[topic].put_nowait(m_jstring)
-        else:
-            self.in_buffer[topic].put_nowait(m_jstring)
+    def callback_constructor(self, topic):
+        def callback(message):
+            print("Callback for topic::", topic)
+            print("Data from callback::", message)
+            m_jstring = json.dumps(message)
+            if self.in_buffer[topic].full() == True:
+                self.in_buffer[topic].get_nowait()
+                self.in_buffer[topic].put_nowait(m_jstring)
+            else:
+                self.in_buffer[topic].put_nowait(m_jstring)
+        return callback
 
     # Returns a list of size `bufsize`
     # List of JSON formatted data from ROS topic

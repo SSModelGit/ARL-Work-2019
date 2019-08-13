@@ -19,7 +19,7 @@ class WebClientLayer:
     def _start_connections(self, message):
         self.sel = selectors.DefaultSelector()
         server_addr = (self.host, self.port)
-        print("starting connection to", server_addr)
+        # print("starting connection to", server_addr)
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock_ref = sock # JUST FOR USE IN FORCE CLOSING
         sock.setblocking(False)
@@ -39,7 +39,7 @@ class WebClientLayer:
         if mask & selectors.EVENT_READ:
             recv_data = sock.recv(1024)  # Should be ready to read
             if recv_data:
-                print("received", recv_data)
+                # print("received", recv_data)
                 self.in_data += recv_data
                 msg_len_find = self.in_data.find("{")
                 if msg_len_find is not -1:
@@ -47,7 +47,7 @@ class WebClientLayer:
                     self.in_data = self.in_data[msg_len_find:]
                 data.recv_total += len(recv_data)
             if not recv_data or data.recv_total == data.msg_total:
-                print("closing connection")
+                # print("closing connection")
                 self.sel.unregister(sock)
                 sock.close()
         if mask & selectors.EVENT_WRITE:
@@ -55,7 +55,7 @@ class WebClientLayer:
                 data.outb = data.message
                 data.message = ""
             if data.outb:
-                print("sending", repr(data.outb), "to socket")
+                # print("sending", repr(data.outb), "to socket")
                 sent = sock.send(data.outb)  # Should be ready to write
                 data.outb = data.outb[sent:]
         self.expose = data
@@ -78,12 +78,12 @@ class WebClientLayer:
             self.in_data = ""
             self.sel.close()
 
-    def force_close(self):
-        # Run in event of force close
-        # This should be caught within connect_aws, but use this just as redundancy
-        self.sel.unregister(self.sock_ref)
-        self.sock_ref.close()
-        self.sel.close()
+    # def force_close(self):
+    #     # Run in event of force close
+    #     # This should be caught within connect_aws, but use this just as redundancy
+    #     self.sel.unregister(self.sock_ref)
+    #     self.sock_ref.close()
+    #     self.sel.close()
 
 
 if __name__ == '__main__':
