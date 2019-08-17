@@ -32,8 +32,8 @@ class ROSLayer:
 
     def callback_constructor(self, topic):
         def callback(message):
-            print("Callback for topic::", topic)
-            print("Data from callback::", message)
+            # print("Callback for topic::", topic)
+            # print("Data from callback::", message)
             m_jstring = json.dumps(message)
             if self.in_buffer[topic].full() == True:
                 self.in_buffer[topic].get_nowait()

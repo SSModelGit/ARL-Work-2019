@@ -3,11 +3,13 @@ from roslayer import ROSLayer
 import json
 
 
+# ID of the ROS Device
+# Can be either an integer or a string (has to function as a key in a dict)
 HOST_ID = 1722
 
 if __name__ == '__main__':
     rosLayer = ROSLayer('localhost', 9090, 5)
-    awsLayer = WebLayer('localhost', 9091)
+    awsLayer = WebLayer('13.229.126.87', 9091)
 
     topics = {"/radio_silence_dev": "std_msgs/String", "/radio_silence_serv": "std_msgs/String",
               "/turtle1/cmd_vel": "geometry_msgs/Twist", "/turtle1/pose": "turtlesim/Pose"}

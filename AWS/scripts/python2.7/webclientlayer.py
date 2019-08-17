@@ -86,10 +86,10 @@ class WebClientLayer:
     #     self.sel.close()
 
 
-if __name__ == '__main__':
-    awsLayer = WebClientLayer('localhost', 9090)
-    mes = dict(linear=dict(x=90, y=360, z=0),
-               angular=dict(x=0, y=360, z=90))
-    # message = json.dumps(mes)
-    message = '{"m_id": 1722, "data": ["{\\"angular\\": {\\"y\\": 360, \\"x\\": 0, \\"z\\": 90}, \\"linear\\": {\\"y\\": 360, \\"x\\": 90, \\"z\\": 0}}"]}'
-    awsLayer.connect_aws(message)
+# if __name__ == '__main__':
+#     awsLayer = WebClientLayer('localhost', 9090)
+#     mes = dict(linear=dict(x=90, y=360, z=0),
+#                angular=dict(x=0, y=360, z=90))
+#     # message = json.dumps(mes)
+#     message = '{"m_id": 1722, "data": ["{\\"angular\\": {\\"y\\": 360, \\"x\\": 0, \\"z\\": 90}, \\"linear\\": {\\"y\\": 360, \\"x\\": 90, \\"z\\": 0}}"]}'
+#     awsLayer.connect_aws(message)
