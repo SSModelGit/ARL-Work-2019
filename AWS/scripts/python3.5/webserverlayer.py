@@ -4,6 +4,7 @@ import selectors
 import types
 import json
 
+
 class WebServerLayer:
     def __init__(self, host, port):
         self.sel = selectors.DefaultSelector()
@@ -62,6 +63,7 @@ class WebServerLayer:
     def _i_add_len_header(self, message):
         return str(len(str(len(message))) + len(message)) + message
 
+
 class ServerData:
     def __init__(self):
         self.ros_data = dict()
@@ -89,10 +91,10 @@ class ServerData:
 
 if __name__ == '__main__':
     vault = ServerData()
-    server = WebServerLayer('localhost', 9091)
+    server = WebServerLayer('127.0.0.1', 9091)
 
-    mes = dict(linear= dict(x=1,y=0,z=0),
-               angular=dict(x=0,y=0,z=1))
+    mes = dict(linear=dict(x=1, y=0, z=0),
+               angular=dict(x=0, y=0, z=1))
 
     message = json.dumps(dict(topic="/turtle1/cmd_vel",
                               data=json.dumps(mes)))
