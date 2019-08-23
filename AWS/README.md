@@ -14,11 +14,43 @@ The client side consists of two Python files defining one class each, and a scri
  - The script is the `comm_layer.py` script. It instantiates both the `ROSLayer` and `WebClientLayer` classes, and handles the AWS connection process. It retrieves ROS data from the `ROSLayer` class and sends it to AWS via the `WebClientLayer` class. It also retrieves the server response from the `WebClientLayer` class, parses the response, and then sends the appropriate data from AWS into ROS via the `ROSLayer` class.
 
 # How to use AWS connection scripts
-
 This usage guide will walk through the steps of preparing and running the scripts on the device and server.
 
-## Server-side connection
-### Server setup
-There is little work to do on the server side. The scripts have been tested 
+## Setup
+### Non-specific setup
+Because the connection depends on TCP/IP sockets, ensure that the devices hosting the server and the client have ports exposed for the server and client to access.
 
+### Server setup
+In order for the ROS devices to 'see' the server, run the server scripts on a device that is either on the same local network as the ROS devices, or has a public IP. The script is tested on AWS EC2 Ubuntu instances with public IPs.
+
+As the server uses a Python script, it is recommended to use a virtual environment to run the script. The script has been tested in a virtual environment running Python3.5. Beyond that, there are no other steps required of the server during setup.
+
+### Client setup
+Because the client connection depends on Python scripts, version 2.7, it is recommended to use a virtual environment running Python2.7.
+
+#### Preparing the `ROSLayer`
+In order for the `ROSLayer` class to connect to ROS, both the `roslibpy` package and the `rosbridge_suite` package are required. To install them, follow the steps listed on their documentation.
+
+##### Installing `roslibpy` using pip:
+```
+pip install roslibpy
+```
+In case the installation fails, it is recommended to run the following line before re-attempting installation, to handle any potential dependency issues:
+```
+sudo apt install build-essential libssl-dev libffi-dev python-dev
+```
+##### Installing `rosbridge_suite`:
+Use the apt package manager:
+```
+sudo apt install ros-$(rosversion -d)-rosbridge-server
+```
+#### Preparing the `WebClientLayer`
+The `WebClientLayer` class uses the `selectors2` package, a version of the `selectors` package ported into Python2.7. Install this package using pip:
+```
+pip install selectors2
+```
+
+## Usage
+### Starting & running the server
+### Running the client
 *TO BE COMPLETED*
