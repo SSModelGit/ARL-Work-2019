@@ -81,13 +81,22 @@ Note that this makes ROS accessible via a websocket on the device's port numbere
 
 The rest of the initialization steps are adjusting the parameters within the `comm_layer.py` script:
  - `ROSLayer`: Initializing this object requires three inputs - the IP and port of the websocket connected to ROS, and the queue size of the stored subscribed ROS data.
-   - topics: This is a dictionary of the ROS topics the `ROSLayer` object subscribes to. The keys are strings of the topic names, and the values are strings of the message types, i.e. {"/cmd_vel": "geometry_msgs/Twist"}
  - `AWSLayer`: Initializing this object requires two inputs - the IP and port of the server. For a server on an AWS instance, use the instance's public IP.
  - ROS device ID: This is the unique ID used by the server to differentiate the ROS device. It can be either a string or an integer.
 
 #### Interacting with the stored data from ROS and AWS
 ##### Stored ROS data
+ - run(topics):
+   - This begins the connection to ROS - it requires a list of topics.
+   - topics: This is a dictionary of the ROS topics the `ROSLayer` object subscribes to. The keys are strings of the topic names, and the values are strings of the message types, i.e. {"/cmd_vel": "geometry_msgs/Twist"}.
  - get_data_from_buffer(topic):
-   - This returns the stored data from the buffer. It will be a list of ROS messages 
+   - This returns the stored data from the buffer. It will be a list of the latest ROS messages from that topic - the length of the list is specified by the queue size specified during the `ROSLayer` instantiation. The ROS messages will be in dictionary format. 
+ - send_data_to_buffer(topic, data):
+   - Sends data to a specific topic.
+   - The topic field is expected to be a string, ex. "/chatter"
+   - The data is expected as a JSON string containing a ROS message, ex. '{"linear": {"y": 0, "x": 1, "z": 0}, "angular": {"y": 0, "x": 0, "z": 1}}'
+ - close():
+   - Closes the connection to ROS
 ##### Stored AWS data
-*TO BE COMPLETED*
+ - connect_aws(message):
+   - This sends a message to the IP and port specified during the initialization. The message should be a JSON string. Preferably, the message will follow the format expected by the server - a nested JSON string with two top layer fields, 'data' and 'm_id', with the 'data' field being another JSON string of ROS messages.
