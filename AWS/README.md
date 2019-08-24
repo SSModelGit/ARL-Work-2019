@@ -19,7 +19,7 @@ This usage guide will walk through the steps of preparing and running the script
 
 ## Setup
 ### Non-specific setup
-Because the connection depends on TCP/IP sockets, ensure that the devices hosting the server and the client have ports exposed for the server and client to access.
+Because the connection depends on TCP/IP sockets, ensure that the devices hosting the server and the client have ports exposed for the server and client to access. Additionally, make sure to have cloned this repo into the desired folder!
 
 ### Server setup
 In order for the ROS devices to 'see' the server, run the server scripts on a device that is either on the same local network as the ROS devices, or has a public IP. The script is tested on AWS EC2 Ubuntu instances with public IPs.
