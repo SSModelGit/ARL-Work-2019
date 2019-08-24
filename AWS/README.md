@@ -11,7 +11,8 @@ The server side consists of a single Python script containing two classes and a 
 The client side consists of two Python files defining one class each, and a script that uses both classes to run the client side system. It is written for Python 2.7 and Python3.5+.
  - The first class is the `ROSLayer` class. It utilizes the [`roslibpy`](https://roslibpy.readthedocs.io/en/latest/readme.html) package, and acts as an API between the ROS master and Python. It can subscribe and publish to specified topics. Data received from subscriber callbacks is accessible via class functions.
  - The second class is the `WebClientLayer` class. This class handles the client requests portion of the server-client connection between AWS and the ROS device. The ROS data desired by AWS is sent as the client message in the client request. The class saves the server response.
- - The script is the `comm_layer.py` script. It instantiates both the `ROSLayer` and `WebClientLayer` classes, and handles the AWS connection process. It retrieves ROS data from the `ROSLayer` class and sends it to AWS via the `WebClientLayer` class. It also retrieves the server response from the `WebClientLayer` class, parses the response, and then sends the appropriate data from AWS into ROS via the `ROSLayer` class.
+ - The script is the `comm_layer.py` script. It instantiates both the `ROSLayer` and `WebClientLayer` classes, and handles the AWS connection process. It retrieves ROS data from the `ROSLayer` class, adds an ID tag to the data, and sends it to AWS via the `WebClientLayer` class. It also retrieves the server response from the `WebClientLayer` class, parses the response, and then sends the appropriate data from AWS into ROS via the `ROSLayer` class.
+   - The `comm_layer.py` script also introduces a ROS device ID. This ID is used by the server to identify the device, and so should be unique among all other devices contacting the same server.
 
 # How to use AWS connection scripts
 This usage guide will walk through the steps of preparing and running the scripts on the device and server.
@@ -52,5 +53,41 @@ pip install selectors2
 
 ## Usage
 ### Starting & running the server
+#### Basic use
+The server requires both an IP and a port for initialization - these are specified when initializing the `WebServerData` object. 
+
+For the AWS server, make sure to point the `WebServerClass` to the AWS instance's private IP, and make sure the specified port number is listed within the AWS instance's port connection rules as a TCP port.
+
+#### Interacting with the `ServerData` object
+The `ServerData` class interacts with the script via two methods:
+ - get_ros_data():
+   - This method retrieves all the stored ROS data from all ROS devices. The returned data structure is a Python dictionary. The keys are the ROS device IDs, and the values are the corresponding stored ROS data per device. The ROS data for a given device consists of an array of ROS messages, in the form of dictionaries, i.e. a message of type *geometry_msgs/Twist* would be:
+     - {linear: {x: 0, y: 0, z: 0}, angular: {x: 0, y: 0, z: 0}}
+ - set_server_data(m_id, data):
+   - This sets the data to be sent to a ROS device specified by its device ID. The arguments to the method are described below:
+     - m_id: This is the unique device ID of the desired ROS device. Choose the appropriate device ID depending on which device the data should be sent to. 
+     - data: This is a nested JSON message. There are two top layer fields: *topic* and *data*. The *topic* field is a string of the ROS topic to which the data should be published to. The *data* field contains a JSON message of the ROS message data, in dictionary form as discussed earlier. An example of this is below:
+       - ros_data = JSON( { topic: "/topic_name", data: JSON( { data: 1 }) } ), or
+       - ros_data = json.dumps( {'topic': "/turtle1/cmd_vel", 'data': json.dumps( {'linear': {'x': 1, 'y': 0, 'z': 0}, 'angular': {'x': 0, 'y': 0, 'z': 0}} ) } )
+         - It is important to nest the JSON messages, as after the client loads the JSON message into a dictionary, it will expect to find a JSON messsage under the *data* field.
+   
 ### Running the client
+#### Initialization
+The first step is to enable websocket connectivity with ROS. To do this, run the `rosbridge_websocket` launch file, using the following command:
+```
+roslaunch rosbridge_server rosbridge_websocket.launch
+```
+Note that this makes ROS accessible via a websocket on the device's port numbered 9090. If a different port is preferred, edit the according value in the launch file (*rosbridge_websocket.launch*).
+
+The rest of the initialization steps are adjusting the parameters within the `comm_layer.py` script:
+ - `ROSLayer`: Initializing this object requires three inputs - the IP and port of the websocket connected to ROS, and the queue size of the stored subscribed ROS data.
+   - topics: This is a dictionary of the ROS topics the `ROSLayer` object subscribes to. The keys are strings of the topic names, and the values are strings of the message types, i.e. {"/cmd_vel": "geometry_msgs/Twist"}
+ - `AWSLayer`: Initializing this object requires two inputs - the IP and port of the server. For a server on an AWS instance, use the instance's public IP.
+ - ROS device ID: This is the unique ID used by the server to differentiate the ROS device. It can be either a string or an integer.
+
+#### Interacting with the stored data from ROS and AWS
+##### Stored ROS data
+ - get_data_from_buffer(topic):
+   - This returns the stored data from the buffer. It will be a list of ROS messages 
+##### Stored AWS data
 *TO BE COMPLETED*
