@@ -24,9 +24,14 @@ The key to allowing Docker to replace the top-side computer is to have it emulat
    - Expose the desired port on the Docker container.
    - Set the Docker container to share the host's (RPi's) network.
  - Setup the RPi to start/run this container in the backgroun on startup.
+ 
+### Setting up the Pixhawk
+The most important part of using Docker to run ROS on the RPi is that it doesn't touch the RPi's standard image. Hence, it is possible to use the standard instructions for setting up related components, such as the Pixhawk onboard the BlueROV. Use the instructions on the [ArduSub website](https://www.ardusub.com/getting-started/installation.html#ardusub) to flash the Pixhawk with the ArduSub firmware.
+
+#### Setting up a brand new RPi
+Again, the power of using Docker is that the standard companion computer image provided by ArduSub (and BlueRobotics) can be used. If the Raspberry Pi being used is not the standard RPi that comes with the BlueROV (and hence one that already has the companion computer image installed), then use the instructions on the [ArduSub website](https://www.ardusub.com/getting-started/installation.html#raspberry-pi) to install the appropriate companion image. 
 
 ### Setup the RPi3B+ for Docker Use
-
 #### Connect to the RPi
 
 Connect to the RPi via an ethernet cable, and use `ifconfig` to place the ethernet connection on the same IP network as the RPi (i.e. if the RPi has an IP of `192.169.2.0`, then use `ifconfig` to place the ethernet connection at `192.168.2.1`). Make sure that the RPi has enabled/allowed SSH connections, and then use command below to SSH into the Raspberry Pi:
