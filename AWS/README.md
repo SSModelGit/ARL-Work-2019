@@ -90,7 +90,7 @@ The rest of the initialization steps are adjusting the parameters within the `co
    - This begins the connection to ROS - it requires a list of topics.
    - topics: This is a dictionary of the ROS topics the `ROSLayer` object subscribes to. The keys are strings of the topic names, and the values are strings of the message types, i.e. {"/cmd_vel": "geometry_msgs/Twist"}.
  - get_data_from_buffer(topic):
-   - This returns the stored data from the buffer. It will be a list of the latest ROS messages from that topic - the length of the list is specified by the queue size specified during the `ROSLayer` instantiation. The ROS messages will be in dictionary format. 
+   - This returns the stored data from the buffer. It will be a list of the latest ROS messages from that topic - the length of the list is specified by the queue size specified during the `ROSLayer` instantiation. The ROS messages will be in JSON format. 
  - send_data_to_buffer(topic, data):
    - Sends data to a specific topic.
    - The topic field is expected to be a string, ex. "/chatter"
