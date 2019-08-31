@@ -8,12 +8,10 @@ Repository containing work done at ARL. Currently split into three branches of w
    - Work on the Kingfisher vehicle from Clearpath Robotics in ARL
 
 ## AWS
-Documentation for the AWS branch is located [here]().
+Documentation for the AWS branch is located [here](https://github.com/SSModelGit/ARL-Work-2019/blob/master/AWS/README.md).
 
 ## BlueROV
-Documentation for the BlueROV branch is located [here]().
+Documentation for the BlueROV branch is located [here](https://github.com/SSModelGit/ARL-Work-2019/blob/master/BlueROV/docs/docker/USAGE.md).
 
 ## Kingfisher
-Documentation for the Kingfisher branch is located [here]().
-
-**links to documentation still to come**
+Summary of the Kingfisher's hardware status is located in [this directory](https://github.com/SSModelGit/ARL-Work-2019/tree/master/Kingfisher/HardwareStatus).
